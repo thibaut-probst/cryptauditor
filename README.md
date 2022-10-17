@@ -1,2 +1,2 @@
 # cryptauditor
-A cryptography auditor tool to measure algorithms speed
+A cryptography audit tool to measure algorithms speed
