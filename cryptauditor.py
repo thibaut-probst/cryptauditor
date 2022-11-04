@@ -11,6 +11,16 @@ from Crypto.Random import get_random_bytes
 from binascii import hexlify
 
 def aes_ecb(key, data, n_rounds):
+    '''
+    AES ECB speed measurement function
+        
+            Parameters:
+                key (str): key
+                data (str): plaintext data
+                n_rounds (int): queue to communicate with receiver thread
+            Returns:
+                (avg_enc_time, avg_dec_time) (tuple): return encryption and decryption times ((float, float): success, (False, False): failure)
+    ''' 
     print(
         f'Performing {n_rounds} rounds of AES encryption and decryption in ECB mode with a {key_len}-bit random key on {data_size} of random data'
     )
@@ -45,6 +55,16 @@ def aes_ecb(key, data, n_rounds):
         return (avg_enc_time/n_rounds, avg_dec_time/n_rounds)
 
 def aes_cbc(key, data, n_rounds):
+    '''
+    AES CBC speed measurement function
+        
+            Parameters:
+                key (str): key
+                data (str): plaintext data
+                n_rounds (int): queue to communicate with receiver thread
+            Returns:
+                (avg_enc_time, avg_dec_time) (tuple): return encryption and decryption times ((float, float): success, (False, False): failure)
+    ''' 
     print(
         f'Performing {n_rounds} rounds of AES encryption and decryption in CBC mode with a {key_len}-bit random key on {data_size} of random data'
     )
@@ -80,6 +100,16 @@ def aes_cbc(key, data, n_rounds):
         return (avg_enc_time/n_rounds, avg_dec_time/n_rounds)
 
 def aes_cfb(key, data, n_rounds):
+    '''
+    AES CFB speed measurement function
+        
+            Parameters:
+                key (str): key
+                data (str): plaintext data
+                n_rounds (int): queue to communicate with receiver thread
+            Returns:
+                (avg_enc_time, avg_dec_time) (tuple): return encryption and decryption times ((float, float): success, (False, False): failure)
+    ''' 
     print(
         f'Performing {n_rounds} rounds of AES encryption and decryption in CFB mode with a {key_len}-bit random key on {data_size} of random data'
     )
@@ -115,6 +145,16 @@ def aes_cfb(key, data, n_rounds):
         return (avg_enc_time/n_rounds, avg_dec_time/n_rounds)
 
 def aes_ofb(key, data, n_rounds):
+    '''
+    AES OFB speed measurement function
+        
+            Parameters:
+                key (str): key
+                data (str): plaintext data
+                n_rounds (int): queue to communicate with receiver thread
+            Returns:
+                (avg_enc_time, avg_dec_time) (tuple): return encryption and decryption times ((float, float): success, (False, False): failure)
+    '''
     print(
         f'Performing {n_rounds} rounds of AES encryption and decryption in OFB mode with a {key_len}-bit random key on {data_size} of random data'
     )
@@ -150,6 +190,16 @@ def aes_ofb(key, data, n_rounds):
         return (avg_enc_time/n_rounds, avg_dec_time/n_rounds)
 
 def aes_ctr(key, data, n_rounds):
+    '''
+    AES CTR speed measurement function
+        
+            Parameters:
+                key (str): key
+                data (str): plaintext data
+                n_rounds (int): queue to communicate with receiver thread
+            Returns:
+                (avg_enc_time, avg_dec_time) (tuple): return encryption and decryption times ((float, float): success, (False, False): failure)
+    '''
     print(
         f'Performing {n_rounds} rounds of AES encryption and decryption in CTR mode with a {key_len}-bit random key on {data_size} of random data'
     )
@@ -189,6 +239,16 @@ def aes_ctr(key, data, n_rounds):
         return (avg_enc_time/n_rounds, avg_dec_time/n_rounds)
 
 def aes_ccm(key, data, n_rounds):
+    '''
+    AES CCM speed measurement function
+        
+            Parameters:
+                key (str): key
+                data (str): plaintext data
+                n_rounds (int): queue to communicate with receiver thread
+            Returns:
+                (avg_enc_time, avg_dec_time) (tuple): return encryption and decryption times ((float, float): success, (False, False): failure)
+    '''
     print(
         f'Performing {n_rounds} rounds of AES encryption and decryption in CCM mode with a {key_len}-bit random key on {data_size} of random data'
     )
@@ -224,6 +284,16 @@ def aes_ccm(key, data, n_rounds):
         return (avg_enc_time/n_rounds, avg_dec_time/n_rounds)
 
 def aes_gcm(key, data, n_rounds):
+    '''
+    AES GCM speed measurement function
+        
+            Parameters:
+                key (str): key
+                data (str): plaintext data
+                n_rounds (int): queue to communicate with receiver thread
+            Returns:
+                (avg_enc_time, avg_dec_time) (tuple): return encryption and decryption times ((float, float): success, (False, False): failure)
+    '''
     print(
         f'Performing {n_rounds} rounds of AES encryption and decryption in GCM mode with a {key_len}-bit random key on {data_size} of random data'
     )
@@ -259,6 +329,16 @@ def aes_gcm(key, data, n_rounds):
         return (avg_enc_time/n_rounds, avg_dec_time/n_rounds)
 
 def aes_siv(key, data, n_rounds):
+    '''
+    AES SIV speed measurement function
+        
+            Parameters:
+                key (str): key
+                data (str): plaintext data
+                n_rounds (int): queue to communicate with receiver thread
+            Returns:
+                (avg_enc_time, avg_dec_time) (tuple): return encryption and decryption times ((float, float): success, (False, False): failure)
+    '''
     print(
         f'Performing {n_rounds} rounds of AES encryption and decryption in SIV mode with a {key_len}-bit random key on {data_size} of random data'
     )
@@ -295,6 +375,16 @@ def aes_siv(key, data, n_rounds):
         return (avg_enc_time/n_rounds, avg_dec_time/n_rounds)
 
 def aes_eax(key, data, n_rounds):
+    '''
+    AES EAX speed measurement function
+        
+            Parameters:
+                key (str): key
+                data (str): plaintext data
+                n_rounds (int): queue to communicate with receiver thread
+            Returns:
+                (avg_enc_time, avg_dec_time) (tuple): return encryption and decryption times ((float, float): success, (False, False): failure)
+    '''
     print(
         f'Performing {n_rounds} rounds of AES encryption and decryption in EAX mode with a {key_len}-bit random key on {data_size} of random data'
     )
@@ -330,6 +420,16 @@ def aes_eax(key, data, n_rounds):
         return (avg_enc_time/n_rounds, avg_dec_time/n_rounds)
 
 def aes_ocb(key, data, n_rounds):
+    '''
+    AES OCB speed measurement function
+        
+            Parameters:
+                key (str): key
+                data (str): plaintext data
+                n_rounds (int): queue to communicate with receiver thread
+            Returns:
+                (avg_enc_time, avg_dec_time) (tuple): return encryption and decryption times ((float, float): success, (False, False): failure)
+    '''
     print(
         f'Performing {n_rounds} rounds of AES encryption and decryption in OCB mode with a {key_len}-bit random key on {data_size} of random data'
     )
@@ -364,7 +464,18 @@ def aes_ocb(key, data, n_rounds):
             gc.enable()
         return (avg_enc_time/n_rounds, avg_dec_time/n_rounds)
 
-def rsa_oaep(key, data, n_rounds):
+def rsa_oaep(key_len, data_len, data, n_rounds):
+    '''
+    RSA OAEP speed measurement function
+        
+            Parameters:
+                key_len (int): key length
+                data_len (int): plaintext data length
+                data (str): plaintext data
+                n_rounds (int): queue to communicate with receiver thread
+            Returns:
+                (avg_enc_time, avg_dec_time) (tuple): return encryption and decryption times ((float, float): success, (False, False): failure)
+    '''
     if key_len < 1024:
         print(f'RSA key length must be greater or equal to 1024')
         return (False, False)
@@ -536,7 +647,7 @@ if __name__ == '__main__':
         case 'AES-OCB':
             (avg_enc_time, avg_dec_time) = aes_ocb(key, data, n_rounds)
         case 'RSA-OAEP':
-            (avg_enc_time, avg_dec_time) = rsa_oaep(key, data, n_rounds)
+            (avg_enc_time, avg_dec_time) = rsa_oaep(key_len, data_len, data, n_rounds)
         case 'AES-ALL':
             encryption_times = {}
             decryption_times = {}
