@@ -3,18 +3,325 @@ from os import urandom
 from re import search
 from time import perf_counter
 import gc
-from Crypto.Cipher import AES, PKCS1_OAEP
+from Crypto.Hash import SHA224, SHA256, SHA384, SHA512, SHA3_224, SHA3_256, SHA3_384, SHA3_512
+from Crypto.Cipher import AES, PKCS1_OAEP, ChaCha20, Salsa20
 from Crypto.PublicKey import RSA
 from Crypto.Util import Counter
 from Crypto.Util.Padding import pad, unpad
 from Crypto.Random import get_random_bytes
 from binascii import hexlify
 
-def aes_ecb(key, data, n_rounds):
+# SHA3-384, SHA3-512, TUPLEHASH128, TUPLEHASH256
+def sha_224(gc_is_enabled, data, n_rounds):
+    '''
+    SHA-224 speed measurement function
+        
+            Parameters:
+                gc_is_enabled (bool): indicates if garbage collector is enabled or not
+                key (str): key
+                data (str): plaintext data
+                n_rounds (int): queue to communicate with receiver thread
+            Returns:
+                avg_hash_time (float): return hash time or False if failure
+    '''
+    print(
+        f'Performing {n_rounds} rounds of SHA-224 hash on {data_size} of random data'
+    )
+    avg_hash_time = 0
+    # Disable Garbage Collector
+    gc.disable()              
+    start = 0
+    end = 0
+    try:
+        for i in range(n_rounds):
+            # Hash
+            start = perf_counter()
+            h = SHA224.new(data)
+            end = perf_counter()
+            if (len(h.digest()) * 8) != 224:
+                print(f'Error: hash output length is not 224-bit long')
+                return (False, False)
+            avg_hash_time += end - start
+    except Exception as e:
+        print(f'Error: {e}')
+        return False
+    finally:
+        if gc_is_enabled:
+            gc.enable()
+        return avg_hash_time/n_rounds
+
+def sha_256(gc_is_enabled, data, n_rounds):
+    '''
+    SHA-256 speed measurement function
+        
+            Parameters:
+                gc_is_enabled (bool): indicates if garbage collector is enabled or not
+                key (str): key
+                data (str): plaintext data
+                n_rounds (int): queue to communicate with receiver thread
+            Returns:
+                avg_hash_time (float): return hash time or False if failure
+    '''
+    print(
+        f'Performing {n_rounds} rounds of SHA-256 hash on {data_size} of random data'
+    )
+    avg_hash_time = 0
+    # Disable Garbage Collector
+    gc.disable()              
+    start = 0
+    end = 0
+    try:
+        for i in range(n_rounds):
+            # Hash
+            start = perf_counter()
+            h = SHA256.new(data)
+            end = perf_counter()
+            if (len(h.digest()) * 8) != 256:
+                print(f'Error: hash output length is not 256-bit long')
+                return (False, False)
+            avg_hash_time += end - start
+    except Exception as e:
+        print(f'Error: {e}')
+        return False
+    finally:
+        if gc_is_enabled:
+            gc.enable()
+        return avg_hash_time/n_rounds
+
+def sha_384(gc_is_enabled, data, n_rounds):
+    '''
+    SHA-384 speed measurement function
+        
+            Parameters:
+                gc_is_enabled (bool): indicates if garbage collector is enabled or not
+                key (str): key
+                data (str): plaintext data
+                n_rounds (int): queue to communicate with receiver thread
+            Returns:
+                avg_hash_time (float): return hash time or False if failure
+    '''
+    print(
+        f'Performing {n_rounds} rounds of SHA-384 hash on {data_size} of random data'
+    )
+    avg_hash_time = 0
+    # Disable Garbage Collector
+    gc.disable()              
+    start = 0
+    end = 0
+    try:
+        for i in range(n_rounds):
+            # Hash
+            start = perf_counter()
+            h = SHA384.new(data)
+            end = perf_counter()
+            if (len(h.digest()) * 8) != 384:
+                print(f'Error: hash output length is not 256-bit long')
+                return (False, False)
+            avg_hash_time += end - start
+    except Exception as e:
+        print(f'Error: {e}')
+        return False
+    finally:
+        if gc_is_enabled:
+            gc.enable()
+        return avg_hash_time/n_rounds
+
+def sha_512(gc_is_enabled, data, n_rounds):
+    '''
+    SHA-512 speed measurement function
+        
+            Parameters:
+                gc_is_enabled (bool): indicates if garbage collector is enabled or not
+                key (str): key
+                data (str): plaintext data
+                n_rounds (int): queue to communicate with receiver thread
+            Returns:
+                avg_hash_time (float): return hash time or False if failure
+    '''
+    print(
+        f'Performing {n_rounds} rounds of SHA-512 hash on {data_size} of random data'
+    )
+    avg_hash_time = 0
+    # Disable Garbage Collector
+    gc.disable()              
+    start = 0
+    end = 0
+    try:
+        for i in range(n_rounds):
+            # Hash
+            start = perf_counter()
+            h = SHA512.new(data)
+            end = perf_counter()
+            if (len(h.digest()) * 8) != 512:
+                print(f'Error: hash output length is not 512-bit long')
+                return (False, False)
+            avg_hash_time += end - start
+    except Exception as e:
+        print(f'Error: {e}')
+        return False
+    finally:
+        if gc_is_enabled:
+            gc.enable()
+        return avg_hash_time/n_rounds
+
+def sha3_224(gc_is_enabled, data, n_rounds):
+    '''
+    SHA3-224 speed measurement function
+        
+            Parameters:
+                gc_is_enabled (bool): indicates if garbage collector is enabled or not
+                key (str): key
+                data (str): plaintext data
+                n_rounds (int): queue to communicate with receiver thread
+            Returns:
+                avg_hash_time (float): return hash time or False if failure
+    '''
+    print(
+        f'Performing {n_rounds} rounds of SHA3-224 hash on {data_size} of random data'
+    )
+    avg_hash_time = 0
+    # Disable Garbage Collector
+    gc.disable()              
+    start = 0
+    end = 0
+    try:
+        for i in range(n_rounds):
+            # Hash
+            start = perf_counter()
+            h = SHA3_224.new(data=data)
+            end = perf_counter()
+            if (len(h.digest()) * 8) != 224:
+                print(f'Error: hash output length is not 224-bit long')
+                return (False, False)
+            avg_hash_time += end - start
+    except Exception as e:
+        print(f'Error: {e}')
+        return False
+    finally:
+        if gc_is_enabled:
+            gc.enable()
+        return avg_hash_time/n_rounds
+
+def sha3_256(gc_is_enabled, data, n_rounds):
+    '''
+    SHA3-256 speed measurement function
+        
+            Parameters:
+                gc_is_enabled (bool): indicates if garbage collector is enabled or not
+                key (str): key
+                data (str): plaintext data
+                n_rounds (int): queue to communicate with receiver thread
+            Returns:
+                avg_hash_time (float): return hash time or False if failure
+    '''
+    print(
+        f'Performing {n_rounds} rounds of SHA3-256 hash on {data_size} of random data'
+    )
+    avg_hash_time = 0
+    # Disable Garbage Collector
+    gc.disable()              
+    start = 0
+    end = 0
+    try:
+        for i in range(n_rounds):
+            # Hash
+            start = perf_counter()
+            h = SHA3_256.new(data=data)
+            end = perf_counter()
+            if (len(h.digest()) * 8) != 256:
+                print(f'Error: hash output length is not 256-bit long')
+                return (False, False)
+            avg_hash_time += end - start
+    except Exception as e:
+        print(f'Error: {e}')
+        return False
+    finally:
+        if gc_is_enabled:
+            gc.enable()
+        return avg_hash_time/n_rounds
+
+def sha3_384(gc_is_enabled, data, n_rounds):
+    '''
+    SHA3-384 speed measurement function
+        
+            Parameters:
+                gc_is_enabled (bool): indicates if garbage collector is enabled or not
+                key (str): key
+                data (str): plaintext data
+                n_rounds (int): queue to communicate with receiver thread
+            Returns:
+                avg_hash_time (float): return hash time or False if failure
+    '''
+    print(
+        f'Performing {n_rounds} rounds of SHA3-384 hash on {data_size} of random data'
+    )
+    avg_hash_time = 0
+    # Disable Garbage Collector
+    gc.disable()              
+    start = 0
+    end = 0
+    try:
+        for i in range(n_rounds):
+            # Hash
+            start = perf_counter()
+            h = SHA3_384.new(data=data)
+            end = perf_counter()
+            if (len(h.digest()) * 8) != 384:
+                print(f'Error: hash output length is not 384-bit long')
+                return (False, False)
+            avg_hash_time += end - start
+    except Exception as e:
+        print(f'Error: {e}')
+        return False
+    finally:
+        if gc_is_enabled:
+            gc.enable()
+        return avg_hash_time/n_rounds
+
+def sha3_512(gc_is_enabled, data, n_rounds):
+    '''
+    SHA3-512 speed measurement function
+        
+            Parameters:
+                gc_is_enabled (bool): indicates if garbage collector is enabled or not
+                key (str): key
+                data (str): plaintext data
+                n_rounds (int): queue to communicate with receiver thread
+            Returns:
+                avg_hash_time (float): return hash time or False if failure
+    '''
+    print(
+        f'Performing {n_rounds} rounds of SHA3-512 hash on {data_size} of random data'
+    )
+    avg_hash_time = 0
+    # Disable Garbage Collector
+    gc.disable()              
+    start = 0
+    end = 0
+    try:
+        for i in range(n_rounds):
+            # Hash
+            start = perf_counter()
+            h = SHA3_512.new(data=data)
+            end = perf_counter()
+            if (len(h.digest()) * 8) != 512:
+                print(f'Error: hash output length is not 512-bit long')
+                return (False, False)
+            avg_hash_time += end - start
+    except Exception as e:
+        print(f'Error: {e}')
+        return False
+    finally:
+        if gc_is_enabled:
+            gc.enable()
+        return avg_hash_time/n_rounds
+
+def aes_ecb(gc_is_enabled, key, data, n_rounds):
     '''
     AES ECB speed measurement function
         
             Parameters:
+                gc_is_enabled (bool): indicates if garbage collector is enabled or not
                 key (str): key
                 data (str): plaintext data
                 n_rounds (int): queue to communicate with receiver thread
@@ -44,7 +351,8 @@ def aes_ecb(key, data, n_rounds):
             plaintext = unpad(cipher2.decrypt(ciphertext), AES.block_size)
             end = perf_counter()
             if plaintext != data:
-                print(f'Warning: decrypted ciphertext does not match initial plaintext!')
+                print(f'Error: decrypted ciphertext does not match initial plaintext!')
+                return (False, False)
             avg_dec_time += end - start
     except Exception as e:
         print(f'Error: {e}')
@@ -54,11 +362,12 @@ def aes_ecb(key, data, n_rounds):
             gc.enable()
         return (avg_enc_time/n_rounds, avg_dec_time/n_rounds)
 
-def aes_cbc(key, data, n_rounds):
+def aes_cbc(gc_is_enabled, key, data, n_rounds):
     '''
     AES CBC speed measurement function
         
             Parameters:
+                gc_is_enabled (bool): indicates if garbage collector is enabled or not
                 key (str): key
                 data (str): plaintext data
                 n_rounds (int): queue to communicate with receiver thread
@@ -89,7 +398,8 @@ def aes_cbc(key, data, n_rounds):
             plaintext = unpad(cipher2.decrypt(ciphertext), AES.block_size)
             end = perf_counter()
             if plaintext != data:
-                print(f'Warning: decrypted ciphertext does not match initial plaintext!')
+                print(f'Error: decrypted ciphertext does not match initial plaintext!')
+                return (False, False)
             avg_dec_time += end - start
     except Exception as e:
         print(f'Error: {e}')
@@ -99,11 +409,12 @@ def aes_cbc(key, data, n_rounds):
             gc.enable()
         return (avg_enc_time/n_rounds, avg_dec_time/n_rounds)
 
-def aes_cfb(key, data, n_rounds):
+def aes_cfb(gc_is_enabled, key, data, n_rounds):
     '''
     AES CFB speed measurement function
         
             Parameters:
+                gc_is_enabled (bool): indicates if garbage collector is enabled or not
                 key (str): key
                 data (str): plaintext data
                 n_rounds (int): queue to communicate with receiver thread
@@ -134,7 +445,8 @@ def aes_cfb(key, data, n_rounds):
             plaintext = cipher2.decrypt(ciphertext)
             end = perf_counter()
             if plaintext != data:
-                print(f'Warning: decrypted ciphertext does not match initial plaintext!')
+                print(f'Error: decrypted ciphertext does not match initial plaintext!')
+                return (False, False)
             avg_dec_time += end - start
     except Exception as e:
         print(f'Error: {e}')
@@ -144,11 +456,12 @@ def aes_cfb(key, data, n_rounds):
             gc.enable()
         return (avg_enc_time/n_rounds, avg_dec_time/n_rounds)
 
-def aes_ofb(key, data, n_rounds):
+def aes_ofb(gc_is_enabled, key, data, n_rounds):
     '''
     AES OFB speed measurement function
         
             Parameters:
+                gc_is_enabled (bool): indicates if garbage collector is enabled or not
                 key (str): key
                 data (str): plaintext data
                 n_rounds (int): queue to communicate with receiver thread
@@ -179,7 +492,8 @@ def aes_ofb(key, data, n_rounds):
             plaintext = cipher2.decrypt(ciphertext)
             end = perf_counter()
             if plaintext != data:
-                print(f'Warning: decrypted ciphertext does not match initial plaintext!')
+                print(f'Error: decrypted ciphertext does not match initial plaintext!')
+                return (False, False)
             avg_dec_time += end - start
     except Exception as e:
         print(f'Error: {e}')
@@ -189,11 +503,12 @@ def aes_ofb(key, data, n_rounds):
             gc.enable()
         return (avg_enc_time/n_rounds, avg_dec_time/n_rounds)
 
-def aes_ctr(key, data, n_rounds):
+def aes_ctr(gc_is_enabled, key, data, n_rounds):
     '''
     AES CTR speed measurement function
         
             Parameters:
+                gc_is_enabled (bool): indicates if garbage collector is enabled or not
                 key (str): key
                 data (str): plaintext data
                 n_rounds (int): queue to communicate with receiver thread
@@ -238,11 +553,12 @@ def aes_ctr(key, data, n_rounds):
             gc.enable()
         return (avg_enc_time/n_rounds, avg_dec_time/n_rounds)
 
-def aes_ccm(key, data, n_rounds):
+def aes_ccm(gc_is_enabled, key, data, n_rounds):
     '''
     AES CCM speed measurement function
         
             Parameters:
+                gc_is_enabled (bool): indicates if garbage collector is enabled or not
                 key (str): key
                 data (str): plaintext data
                 n_rounds (int): queue to communicate with receiver thread
@@ -283,11 +599,12 @@ def aes_ccm(key, data, n_rounds):
             gc.enable()
         return (avg_enc_time/n_rounds, avg_dec_time/n_rounds)
 
-def aes_gcm(key, data, n_rounds):
+def aes_gcm(gc_is_enabled, key, data, n_rounds):
     '''
     AES GCM speed measurement function
         
             Parameters:
+                gc_is_enabled (bool): indicates if garbage collector is enabled or not
                 key (str): key
                 data (str): plaintext data
                 n_rounds (int): queue to communicate with receiver thread
@@ -328,11 +645,12 @@ def aes_gcm(key, data, n_rounds):
             gc.enable()
         return (avg_enc_time/n_rounds, avg_dec_time/n_rounds)
 
-def aes_siv(key, data, n_rounds):
+def aes_siv(gc_is_enabled, key, data, n_rounds):
     '''
     AES SIV speed measurement function
         
             Parameters:
+                gc_is_enabled (bool): indicates if garbage collector is enabled or not
                 key (str): key
                 data (str): plaintext data
                 n_rounds (int): queue to communicate with receiver thread
@@ -374,11 +692,12 @@ def aes_siv(key, data, n_rounds):
             gc.enable()
         return (avg_enc_time/n_rounds, avg_dec_time/n_rounds)
 
-def aes_eax(key, data, n_rounds):
+def aes_eax(gc_is_enabled, key, data, n_rounds):
     '''
     AES EAX speed measurement function
         
             Parameters:
+                gc_is_enabled (bool): indicates if garbage collector is enabled or not
                 key (str): key
                 data (str): plaintext data
                 n_rounds (int): queue to communicate with receiver thread
@@ -419,11 +738,12 @@ def aes_eax(key, data, n_rounds):
             gc.enable()
         return (avg_enc_time/n_rounds, avg_dec_time/n_rounds)
 
-def aes_ocb(key, data, n_rounds):
+def aes_ocb(gc_is_enabled, key, data, n_rounds):
     '''
     AES OCB speed measurement function
         
             Parameters:
+                gc_is_enabled (bool): indicates if garbage collector is enabled or not
                 key (str): key
                 data (str): plaintext data
                 n_rounds (int): queue to communicate with receiver thread
@@ -464,11 +784,112 @@ def aes_ocb(key, data, n_rounds):
             gc.enable()
         return (avg_enc_time/n_rounds, avg_dec_time/n_rounds)
 
-def rsa_oaep(key_len, data_len, data, n_rounds):
+def chacha20(gc_is_enabled, key, data, n_rounds):
+    '''
+    CHACHA20 speed measurement function
+        
+            Parameters:
+                gc_is_enabled (bool): indicates if garbage collector is enabled or not
+                key (str): key
+                data (str): plaintext data
+                n_rounds (int): queue to communicate with receiver thread
+            Returns:
+                (avg_enc_time, avg_dec_time) (tuple): return encryption and decryption times ((float, float): success, (False, False): failure)
+    '''
+    key_len = len(key) * 8
+    if key_len != 256:
+        print(f'ChaCha20 key length must be equal to 256')
+        return (False, False)
+    print(
+        f'Performing {n_rounds} rounds of CHACHA20 encryption and decryption with a {key_len}-bit random key on {data_size} of random data'
+    )
+    avg_enc_time = 0
+    avg_dec_time = 0
+    # Disable Garbage Collector
+    gc.disable()              
+    start = 0
+    end = 0
+    try:
+        for i in range(n_rounds):
+            # Encryption
+            cipher1 = ChaCha20.new(key=key)
+            start = perf_counter()
+            ciphertext = cipher1.encrypt(data)
+            end = perf_counter()
+            avg_enc_time += end - start
+            cipher2 = ChaCha20.new(key=key, nonce=cipher1.nonce)
+            # Decryption
+            start = perf_counter()
+            plaintext = cipher2.decrypt(ciphertext)
+            end = perf_counter()
+            if plaintext != data:
+                print(f'Error: decrypted ciphertext does not match initial plaintext!')
+                return (False, False)
+            avg_dec_time += end - start
+    except Exception as e:
+        print(f'Error: {e}')
+        return (False, False)
+    finally:
+        if gc_is_enabled:
+            gc.enable()
+        return (avg_enc_time/n_rounds, avg_dec_time/n_rounds)
+
+def salsa20(gc_is_enabled, key, data, n_rounds):
+    '''
+    SALSA20 speed measurement function
+        
+            Parameters:
+                gc_is_enabled (bool): indicates if garbage collector is enabled or not
+                key (str): key
+                data (str): plaintext data
+                n_rounds (int): queue to communicate with receiver thread
+            Returns:
+                (avg_enc_time, avg_dec_time) (tuple): return encryption and decryption times ((float, float): success, (False, False): failure)
+    '''
+    key_len = len(key) * 8
+    if (key_len != 256) and (key_len != 128):
+        print(f'Salsa20 key length must be equal to 128 or 256')
+        return (False, False)
+    print(
+        f'Performing {n_rounds} rounds of SALSA20 encryption and decryption with a {key_len}-bit random key on {data_size} of random data'
+    )
+    avg_enc_time = 0
+    avg_dec_time = 0
+    # Disable Garbage Collector
+    gc.disable()              
+    start = 0
+    end = 0
+    try:
+        for i in range(n_rounds):
+            # Encryption
+            cipher1 = Salsa20.new(key=key)
+            start = perf_counter()
+            ciphertext = cipher1.encrypt(data)
+            end = perf_counter()
+            avg_enc_time += end - start
+            cipher2 = Salsa20.new(key=key, nonce=cipher1.nonce)
+            # Decryption
+            start = perf_counter()
+            plaintext = cipher2.decrypt(ciphertext)
+            end = perf_counter()
+            if plaintext != data:
+                print(f'Error: decrypted ciphertext does not match initial plaintext!')
+                return (False, False)
+            avg_dec_time += end - start
+    except Exception as e:
+        print(f'Error: {e}')
+        return (False, False)
+    finally:
+        if gc_is_enabled:
+            gc.enable()
+        return (avg_enc_time/n_rounds, avg_dec_time/n_rounds)
+
+def rsa_oaep(gc_is_enabled, key_len, data, n_rounds):
     '''
     RSA OAEP speed measurement function
         
             Parameters:
+                gc_is_enabled (bool): indicates if garbage collector is enabled or not
                 key_len (int): key length
                 data_len (int): plaintext data length
                 data (str): plaintext data
@@ -476,6 +897,7 @@ def rsa_oaep(key_len, data_len, data, n_rounds):
             Returns:
                 (avg_enc_time, avg_dec_time) (tuple): return encryption and decryption times ((float, float): success, (False, False): failure)
     '''
+    data_len = len(data)
     if key_len < 1024:
         print(f'RSA key length must be greater or equal to 1024')
         return (False, False)
@@ -528,8 +950,15 @@ if __name__ == '__main__':
         '--cipher',
         '-c',
         type=str,
-        help='Cipher algorithm and mode of operation (AES-ECB, AES-CBC, AES-CFB, AES-OFB, AES-CTR, AES-CCM, AES-GCM, AES-EAX, AES-SIV, AES-OCB, RSA-OAEP). AES-ALL can be passed to test and compare all modes of operation on AES.',
-        required = True,
+        help='Cipher algorithm and mode of operation (AES-ECB, AES-CBC, AES-CFB, AES-OFB, AES-CTR, AES-CCM, AES-GCM, AES-EAX, AES-SIV, AES-OCB, CHACHA20, SALSA20, RSA-OAEP). AES-ALL can be passed to test and compare all modes of operation on AES. SYMMETRIC-ALL can be passed to test and compare all symmetric cipher algorithms.',
+        required = False,
+    )
+
+    parser.add_argument(
+        '--hash',
+        type=str,
+        help='Hash algorithm (SHA2-224, SHA2-256, SHA2-384, SHA2-512, SHA3-224, SHA3-256, SHA3-384, SHA3-512, TUPLEHASH128, TUPLEHASH256). HASH-ALL can be passed to test and compare all hash algorithms.',
+        required = False,
     )
 
     parser.add_argument(
@@ -570,9 +999,20 @@ if __name__ == '__main__':
 
     args = vars(parser.parse_args())
 
-    cipher = args['cipher'].upper()
-    if cipher == 'RSA':
-        cipher = 'RSA-OAEP'
+    hash_algo = args['hash']
+    cipher = args['cipher']
+
+    if not hash_algo and not cipher:
+        print('A hash or cipher algorithm must be provided')
+        exit()
+    elif hash_algo:
+        hash_algo = hash_algo.upper()
+        if hash_algo.startswith('SHA2-'):
+            hash_algo = f'SHA-{hash_algo[5:]}'
+    elif cipher:
+        cipher = cipher.upper()
+        if cipher == 'RSA':
+            cipher = 'RSA-OAEP'
 
     key_len = args['key_length']
     if (key_len % 8) != 0:
@@ -625,65 +1065,139 @@ if __name__ == '__main__':
             unit_mul = 1
 
     # Compute algorithms and measure speed
-    match cipher:
-        case 'AES-ECB':
-            (avg_enc_time, avg_dec_time) = aes_ecb(key, data, n_rounds)
-        case 'AES-CBC':
-            (avg_enc_time, avg_dec_time) = aes_cbc(key, data, n_rounds)
-        case 'AES-CFB':
-            (avg_enc_time, avg_dec_time) = aes_cfb(key, data, n_rounds)
-        case 'AES-OFB':
-            (avg_enc_time, avg_dec_time) = aes_ofb(key, data, n_rounds)
-        case 'AES-CTR':
-            (avg_enc_time, avg_dec_time) = aes_ctr(key, data, n_rounds)
-        case 'AES-CCM':
-            (avg_enc_time, avg_dec_time) = aes_ccm(key, data, n_rounds)
-        case 'AES-GCM':
-            (avg_enc_time, avg_dec_time) = aes_gcm(key, data, n_rounds)
-        case 'AES-EAX':
-            (avg_enc_time, avg_dec_time) = aes_eax(key, data, n_rounds)
-        case 'AES-SIV':
-            (avg_enc_time, avg_dec_time) = aes_siv(key, data, n_rounds)
-        case 'AES-OCB':
-            (avg_enc_time, avg_dec_time) = aes_ocb(key, data, n_rounds)
-        case 'RSA-OAEP':
-            (avg_enc_time, avg_dec_time) = rsa_oaep(key_len, data_len, data, n_rounds)
-        case 'AES-ALL':
-            encryption_times = {}
-            decryption_times = {}
-            aes_modes = ['AES-ECB', 'AES-CBC', 'AES-CFB', 'AES-OFB', 'AES-CTR', 'AES-CCM', 'AES-GCM', 'AES-EAX', 'AES-SIV', 'AES-OCB']
-            for aes_mode in aes_modes:
-                f = aes_mode.replace('-', '_').lower()
-                (avg_enc_time, avg_dec_time) = eval(f'{f}({key}, {data}, {n_rounds})')
+    if hash_algo:
+        match hash_algo:
+            case 'SHA-224':
+                avg_hash_time = sha_224(gc_is_enabled, data, n_rounds)
+            case 'SHA-256':
+                avg_hash_time = sha_256(gc_is_enabled, data, n_rounds)
+            case 'SHA-384':
+                avg_hash_time = sha_384(gc_is_enabled, data, n_rounds)
+            case 'SHA-512':
+                avg_hash_time = sha_512(gc_is_enabled, data, n_rounds)
+            case 'SHA3-224':
+                avg_hash_time = sha3_224(gc_is_enabled, data, n_rounds)
+            case 'SHA3-256':
+                avg_hash_time = sha3_256(gc_is_enabled, data, n_rounds)
+            case 'SHA3-384':
+                avg_hash_time = sha3_384(gc_is_enabled, data, n_rounds)
+            case 'SHA3-512':
+                avg_hash_time = sha3_512(gc_is_enabled, data, n_rounds)
+            case 'TUPLEHASH128':
+                avg_hash_time = tuplehash128(gc_is_enabled, data, n_rounds)
+            case 'TUPLEHASH256':
+                avg_hash_time = tuplehash256(gc_is_enabled, data, n_rounds)
+            case 'HASH-ALL':
+                hash_times = {}
+                hash_algorithms = ['SHA-224', 'SHA-256', 'SHA-384', 'SHA-512', 'SHA3-224', 'SHA3-256', 'SHA3-384', 'SHA3-512']
+                for hash_algorithm in hash_algorithms:
+                    f = hash_algorithm.replace('-', '_').replace('/', '_').lower()
+                    avg_hash_time = eval(f'{f}({gc_is_enabled}, {data}, {n_rounds})')
+                    avg_hash_time = round(avg_hash_time * unit_mul, 3)
+                    if hash_algorithm.startswith('SHA-'):
+                        hash_algorithm = f'SHA2-{hash_algorithm[4:]}'
+                    hash_times[hash_algorithm] = avg_hash_time
+                hash_times = dict(sorted(hash_times.items(), key=lambda item: item[1]))
+            case _:
+                print(f'{hash_algo} is not a supported hash algorithm')
+                exit()
+        
+        # Print results
+        if (hash_algo == 'HASH-ALL'):
+            print('Hash speed ranking:')
+            best_time = list(hash_times.items())[0][1]
+            n = 1
+            for mode, time in hash_times.items():
+                print(f'{n} - {mode} (+{round(time - best_time, 3)}{unit})')
+                n += 1
+        else:
+            if not avg_hash_time:
+                exit()
+            else:
+                hash_times  = round(avg_hash_time * unit_mul, 3)
+                print(f'Hash time: {hash_times}{unit}')
+    
+    # Compute cipher algorithms and measure speed
+    if cipher:
+        match cipher:
+            case 'AES-ECB':
+                (avg_enc_time, avg_dec_time) = aes_ecb(gc_is_enabled, key, data, n_rounds)
+            case 'AES-CBC':
+                (avg_enc_time, avg_dec_time) = aes_cbc(gc_is_enabled, key, data, n_rounds)
+            case 'AES-CFB':
+                (avg_enc_time, avg_dec_time) = aes_cfb(gc_is_enabled, key, data, n_rounds)
+            case 'AES-OFB':
+                (avg_enc_time, avg_dec_time) = aes_ofb(gc_is_enabled, key, data, n_rounds)
+            case 'AES-CTR':
+                (avg_enc_time, avg_dec_time) = aes_ctr(gc_is_enabled, key, data, n_rounds)
+            case 'AES-CCM':
+                (avg_enc_time, avg_dec_time) = aes_ccm(gc_is_enabled, key, data, n_rounds)
+            case 'AES-GCM':
+                (avg_enc_time, avg_dec_time) = aes_gcm(gc_is_enabled, key, data, n_rounds)
+            case 'AES-EAX':
+                (avg_enc_time, avg_dec_time) = aes_eax(gc_is_enabled, key, data, n_rounds)
+            case 'AES-SIV':
+                (avg_enc_time, avg_dec_time) = aes_siv(gc_is_enabled, key, data, n_rounds)
+            case 'AES-OCB':
+                (avg_enc_time, avg_dec_time) = aes_ocb(gc_is_enabled, key, data, n_rounds)
+            case 'RSA-OAEP':
+                (avg_enc_time, avg_dec_time) = rsa_oaep(gc_is_enabled, key_len, data, n_rounds)
+            case 'CHACHA20':
+                (avg_enc_time, avg_dec_time) = chacha20(gc_is_enabled, key, data, n_rounds)
+            case 'SALSA20':
+                (avg_enc_time, avg_dec_time) = salsa20(gc_is_enabled, key, data, n_rounds)
+            case 'AES-ALL':
+                encryption_times = {}
+                decryption_times = {}
+                aes_modes = ['AES-ECB', 'AES-CBC', 'AES-CFB', 'AES-OFB', 'AES-CTR', 'AES-CCM', 'AES-GCM', 'AES-EAX', 'AES-SIV', 'AES-OCB']
+                for aes_mode in aes_modes:
+                    f = aes_mode.replace('-', '_').lower()
+                    (avg_enc_time, avg_dec_time) = eval(f'{f}({gc_is_enabled}, {key}, {data}, {n_rounds})')
+                    avg_enc_time = round(avg_enc_time * unit_mul, 3)
+                    avg_dec_time = round(avg_dec_time * unit_mul, 3)
+                    encryption_times[aes_mode] = avg_enc_time
+                    decryption_times[aes_mode] = avg_dec_time
+                encryption_times = dict(sorted(encryption_times.items(), key=lambda item: item[1]))
+                decryption_times = dict(sorted(decryption_times.items(), key=lambda item: item[1]))
+            case 'SYMMETRIC-ALL':
+                if key_len != 256:
+                    print('Key length must be equal to 256')
+                    exit()
+                encryption_times = {}
+                decryption_times = {}
+                ciphers = ['AES-ECB', 'AES-CBC', 'AES-CFB', 'AES-OFB', 'AES-CTR', 'AES-CCM', 'AES-GCM', 'AES-EAX', 'AES-SIV', 'AES-OCB', 'CHACHA20', 'SALSA20']
+                for sym_cipher in ciphers:
+                    f = sym_cipher.replace('-', '_').lower()
+                    (avg_enc_time, avg_dec_time) = eval(f'{f}({gc_is_enabled}, {key}, {data}, {n_rounds})')
+                    avg_enc_time = round(avg_enc_time * unit_mul, 3)
+                    avg_dec_time = round(avg_dec_time * unit_mul, 3)
+                    encryption_times[sym_cipher] = avg_enc_time
+                    decryption_times[sym_cipher] = avg_dec_time
+                encryption_times = dict(sorted(encryption_times.items(), key=lambda item: item[1]))
+                decryption_times = dict(sorted(decryption_times.items(), key=lambda item: item[1]))
+            case _:
+                print(f'{cipher} is not a supported cipher algorithm and mode of operation')
+                exit()
+    
+        # Print results
+        if (cipher == 'AES-ALL') or (cipher == 'SYMMETRIC-ALL'):
+            print('Encryption speed ranking:')
+            best_time = list(encryption_times.items())[0][1]
+            n = 1
+            for mode, time in encryption_times.items():
+                print(f'{n} - {mode} (+{round(time - best_time, 3)}{unit})')
+                n += 1
+            print('Decryption speed ranking:')
+            best_time = list(decryption_times.items())[0][1]
+            n = 1
+            for mode, time in decryption_times.items():
+                print(f'{n} - {mode} (+{round(time - best_time, 3)}{unit})')
+                n += 1
+        else:
+            if False in (avg_enc_time, avg_dec_time):
+                exit()
+            else:
                 avg_enc_time = round(avg_enc_time * unit_mul, 3)
                 avg_dec_time = round(avg_dec_time * unit_mul, 3)
-                encryption_times[aes_mode] = avg_enc_time
-                decryption_times[aes_mode] = avg_dec_time
-            encryption_times = dict(sorted(encryption_times.items(), key=lambda item: item[1]))
-            decryption_times = dict(sorted(decryption_times.items(), key=lambda item: item[1]))
-        case _:
-            print(f'{cipher} is not a supported cipher algorithm and mode of operation')
-            exit()
-    
-    # Print results
-    if cipher == 'AES-ALL':
-        print('Encryption speed ranking:')
-        best_time = list(encryption_times.items())[0][1]
-        n = 1
-        for mode, time in encryption_times.items():
-            print(f'{n} - {mode} (+{round(time - best_time, 3)}{unit})')
-            n += 1
-        print('Decryption speed ranking:')
-        best_time = list(decryption_times.items())[0][1]
-        n = 1
-        for mode, time in decryption_times.items():
-            print(f'{n} - {mode} (+{round(time - best_time, 3)}{unit})')
-            n += 1
-    else:
-        if False in (avg_enc_time, avg_dec_time):
-            exit()
-        else:
-            avg_enc_time = round(avg_enc_time * unit_mul, 3)
-            avg_dec_time = round(avg_dec_time * unit_mul, 3)
-            print(f'Encryption time: {avg_enc_time}{unit}')
-            print(f'Decryption time: {avg_dec_time}{unit}')
+                print(f'Encryption time: {avg_enc_time}{unit}')
+                print(f'Decryption time: {avg_dec_time}{unit}')
