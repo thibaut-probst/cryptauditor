@@ -957,7 +957,7 @@ if __name__ == '__main__':
     parser.add_argument(
         '--hash',
         type=str,
-        help='Hash algorithm (SHA2-224, SHA2-256, SHA2-384, SHA2-512, SHA3-224, SHA3-256, SHA3-384, SHA3-512, TUPLEHASH128, TUPLEHASH256). HASH-ALL can be passed to test and compare all hash algorithms.',
+        help='Hash algorithm (SHA2-224, SHA2-256, SHA2-384, SHA2-512, SHA3-224, SHA3-256, SHA3-384, SHA3-512). HASH-ALL can be passed to test and compare all hash algorithms.',
         required = False,
     )
 
