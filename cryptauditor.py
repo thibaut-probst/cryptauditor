@@ -11,7 +11,6 @@ from Crypto.Util.Padding import pad, unpad
 from Crypto.Random import get_random_bytes
 from binascii import hexlify
 
-# SHA3-384, SHA3-512, TUPLEHASH128, TUPLEHASH256
 def sha_224(gc_is_enabled, data, n_rounds):
     '''
     SHA-224 speed measurement function
@@ -1083,10 +1082,6 @@ if __name__ == '__main__':
                 avg_hash_time = sha3_384(gc_is_enabled, data, n_rounds)
             case 'SHA3-512':
                 avg_hash_time = sha3_512(gc_is_enabled, data, n_rounds)
-            case 'TUPLEHASH128':
-                avg_hash_time = tuplehash128(gc_is_enabled, data, n_rounds)
-            case 'TUPLEHASH256':
-                avg_hash_time = tuplehash256(gc_is_enabled, data, n_rounds)
             case 'HASH-ALL':
                 hash_times = {}
                 hash_algorithms = ['SHA-224', 'SHA-256', 'SHA-384', 'SHA-512', 'SHA3-224', 'SHA3-256', 'SHA3-384', 'SHA3-512']
