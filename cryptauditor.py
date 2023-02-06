@@ -1103,7 +1103,7 @@ if __name__ == '__main__':
             best_time = list(hash_times.items())[0][1]
             n = 1
             for mode, time in hash_times.items():
-                print(f'{n} - {mode} (+{round(time - best_time, 3)}{unit})')
+                print(f'{n} - {mode} - {time}{unit} (+{round(time - best_time, 3)}{unit})')
                 n += 1
         else:
             if not avg_hash_time:
@@ -1180,13 +1180,13 @@ if __name__ == '__main__':
             best_time = list(encryption_times.items())[0][1]
             n = 1
             for mode, time in encryption_times.items():
-                print(f'{n} - {mode} (+{round(time - best_time, 3)}{unit})')
+                print(f'{n} - {mode} - {time}{unit} (+{round(time - best_time, 3)}{unit})')
                 n += 1
             print('Decryption speed ranking:')
             best_time = list(decryption_times.items())[0][1]
             n = 1
             for mode, time in decryption_times.items():
-                print(f'{n} - {mode} (+{round(time - best_time, 3)}{unit})')
+                print(f'{n} - {mode} - {time}{unit} (+{round(time - best_time, 3)}{unit})')
                 n += 1
         else:
             if False in (avg_enc_time, avg_dec_time):
