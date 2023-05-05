@@ -5,10 +5,11 @@ from time import perf_counter
 import gc
 from Crypto.Hash import SHA224, SHA256, SHA384, SHA512, SHA3_224, SHA3_256, SHA3_384, SHA3_512
 from Crypto.Cipher import AES, PKCS1_OAEP, ChaCha20, Salsa20
-from Crypto.PublicKey import RSA
+from Crypto.PublicKey import RSA, ECC
 from Crypto.Util import Counter
 from Crypto.Util.Padding import pad, unpad
 from Crypto.Random import get_random_bytes
+from Crypto.Signature import pss, DSS, eddsa
 from binascii import hexlify
 
 def sha_224(gc_is_enabled, data, n_rounds):
@@ -939,6 +940,163 @@ def rsa_oaep(gc_is_enabled, key_len, data, n_rounds):
             gc.enable()
         return (avg_enc_time/n_rounds, avg_dec_time/n_rounds)
 
+def rsa_pss(gc_is_enabled, key_len, data, n_rounds):
+    '''
+    RSA PSS speed measurement function
+        
+            Parameters:
+                gc_is_enabled (bool): indicates if garbage collector is enabled or not
+                key_len (int): key length
+                data_len (int): plaintext data length
+                data (str): plaintext data
+                n_rounds (int): queue to communicate with receiver thread
+            Returns:
+                (avg_enc_time, avg_dec_time) (tuple): return encryption and decryption times ((float, float): success, (False, False): failure)
+    '''
+    data_len = len(data)
+    if key_len < 1024:
+        print(f'RSA key length must be greater or equal to 1024')
+        return (False, False)
+    print(
+        f'Performing {n_rounds} rounds of RSA-PSS signature and verification with a {key_len}-bit random key on {data_size} of random data hashed with SHA-256'
+    )
+    avg_sig_time = 0
+    avg_ver_time = 0
+    # Disable Garbage Collector
+    gc.disable()              
+    start = 0
+    end = 0
+    try:
+        private_key = RSA.generate(key_len)
+        public_key = private_key.publickey()
+        signer = pss.new(private_key)
+        verifier = pss.new(public_key)
+        h = SHA256.new(data)
+        for i in range(n_rounds):
+            # Signature
+            start = perf_counter()
+            signature = signer.sign(h)
+            end = perf_counter()
+            avg_sig_time += end - start
+            # Verification
+            try:
+                start = perf_counter()
+                verifier.verify(h, signature)
+                end = perf_counter()
+            except:
+                print(f'Error: signature is not authentic!')
+                return (False, False)
+            avg_ver_time += end - start
+    except Exception as e:
+        print(f'Error: {e}')
+        return (False, False)
+    finally:
+        if gc_is_enabled:
+            gc.enable()
+        return (avg_sig_time/n_rounds, avg_ver_time/n_rounds)
+
+def ecdsa_256(gc_is_enabled, data, n_rounds):
+    '''
+    ECDSA P-256 speed measurement function
+        
+            Parameters:
+                gc_is_enabled (bool): indicates if garbage collector is enabled or not
+                data_len (int): plaintext data length
+                data (str): plaintext data
+                n_rounds (int): queue to communicate with receiver thread
+            Returns:
+                (avg_enc_time, avg_dec_time) (tuple): return encryption and decryption times ((float, float): success, (False, False): failure)
+    '''
+    data_len = len(data)
+    print(
+        f'Performing {n_rounds} rounds of ECDSA signature and verification with a 256-bit (P-256) elliptic curve on {data_size} of random data hashed with SHA-256'
+    )
+    avg_sig_time = 0
+    avg_ver_time = 0
+    # Disable Garbage Collector
+    gc.disable()              
+    start = 0
+    end = 0
+    try:
+        private_key = ECC.generate(curve='secp256r1')
+        public_key = private_key.public_key()
+        signer = DSS.new(private_key, 'fips-186-3')
+        verifier = DSS.new(public_key, 'fips-186-3')
+        h = SHA256.new(data)
+        for i in range(n_rounds):
+            # Signature
+            start = perf_counter()
+            signature = signer.sign(h)
+            end = perf_counter()
+            avg_sig_time += end - start
+            # Verification
+            try:
+                start = perf_counter()
+                verifier.verify(h, signature)
+                end = perf_counter()
+            except:
+                print(f'Error: signature is not authentic!')
+                return (False, False)
+            avg_ver_time += end - start
+    except Exception as e:
+        print(f'Error: {e}')
+        return (False, False)
+    finally:
+        if gc_is_enabled:
+            gc.enable()
+        return (avg_sig_time/n_rounds, avg_ver_time/n_rounds)
+
+def eddsa_256(gc_is_enabled, data, n_rounds):
+    '''
+    EdDSA Ed25519 speed measurement function
+        
+            Parameters:
+                gc_is_enabled (bool): indicates if garbage collector is enabled or not
+                data_len (int): plaintext data length
+                data (str): plaintext data
+                n_rounds (int): queue to communicate with receiver thread
+            Returns:
+                (avg_enc_time, avg_dec_time) (tuple): return encryption and decryption times ((float, float): success, (False, False): failure)
+    '''
+    data_len = len(data)
+    print(
+        f'Performing {n_rounds} rounds of EdDSA signature and verification with a 256-bit (Ed25519) elliptic curve on {data_size} of random data hashed with SHA-512'
+    )
+    avg_sig_time = 0
+    avg_ver_time = 0
+    # Disable Garbage Collector
+    gc.disable()              
+    start = 0
+    end = 0
+    try:
+        private_key = ECC.generate(curve='ed25519')
+        public_key = private_key.public_key()
+        signer = eddsa.new(private_key, 'rfc8032')
+        verifier = eddsa.new(public_key, 'rfc8032')
+        h = SHA512.new(data)
+        for i in range(n_rounds):
+            # Signature
+            start = perf_counter()
+            signature = signer.sign(h)
+            end = perf_counter()
+            avg_sig_time += end - start
+            # Verification
+            try:
+                start = perf_counter()
+                verifier.verify(h, signature)
+                end = perf_counter()
+            except:
+                print(f'Error: signature is not authentic!')
+                return (False, False)
+            avg_ver_time += end - start
+    except Exception as e:
+        print(f'Error: {e}')
+        return (False, False)
+    finally:
+        if gc_is_enabled:
+            gc.enable()
+        return (avg_sig_time/n_rounds, avg_ver_time/n_rounds)
+
 
 if __name__ == '__main__':
 
@@ -961,11 +1119,18 @@ if __name__ == '__main__':
     )
 
     parser.add_argument(
+        '--signature',
+        '-s',
+        type=str,
+        help='Signature scheme (RSA-PSS, ECDSA, EdDSA). SIGN-ALL can be passed to test and compare all signature schemes',
+        required = False,
+    )
+
+    parser.add_argument(
         '--key_length',
         '-k',
         type=int,
         action='store',
-        default=256,
         help='Key length in bits (must be a multiple of 8, default: 256)',
     )
 
@@ -1000,9 +1165,10 @@ if __name__ == '__main__':
 
     hash_algo = args['hash']
     cipher = args['cipher']
+    signature = args['signature']
 
-    if not hash_algo and not cipher:
-        print('A hash or cipher algorithm must be provided')
+    if not hash_algo and not cipher and not signature:
+        print('A hash, cipher or signature algorithm must be provided')
         exit()
     elif hash_algo:
         hash_algo = hash_algo.upper()
@@ -1012,8 +1178,16 @@ if __name__ == '__main__':
         cipher = cipher.upper()
         if cipher == 'RSA':
             cipher = 'RSA-OAEP'
+    elif signature:
+        signature = signature.upper()
+        if signature == 'RSA':
+            signature = 'RSA-PSS'
 
     key_len = args['key_length']
+    if (not key_len) and (cipher == 'RSA-OAEP' or signature == 'RSA-PSS'):
+        key_len = 2048
+    elif not key_len:
+        key_len = 256
     if (key_len % 8) != 0:
         print('Key length must be a multiple of 8')
         exit()
@@ -1196,3 +1370,55 @@ if __name__ == '__main__':
                 avg_dec_time = round(avg_dec_time * unit_mul, 3)
                 print(f'Encryption time: {avg_enc_time}{unit}')
                 print(f'Decryption time: {avg_dec_time}{unit}')
+
+    if signature:
+        match signature:
+            case 'RSA-PSS':
+                (avg_sig_time, avg_ver_time) = rsa_pss(gc_is_enabled, key_len, data, n_rounds)
+            case 'ECDSA':
+                (avg_sig_time, avg_ver_time) = ecdsa_256(gc_is_enabled, data, n_rounds)
+            case 'EDDSA':
+                (avg_sig_time, avg_ver_time) = eddsa_256(gc_is_enabled, data, n_rounds)
+            case 'SIGN-ALL':
+                signature_times = {}
+                verification_times = {}
+                schemes = ['RSA-PSS', 'ECDSA', 'EdDSA']
+                for scheme in schemes:
+                    f = scheme.replace('-', '_').lower()
+                    if f.startswith('ec') or f.startswith('ed'):
+                        f = f'{f}_256'
+                        (avg_sig_time, avg_ver_time) = eval(f'{f}({gc_is_enabled}, {data}, {n_rounds})')
+                    else:
+                        (avg_sig_time, avg_ver_time) = eval(f'{f}({gc_is_enabled}, {key_len}, {data}, {n_rounds})')
+                    avg_sig_time = round(avg_sig_time * unit_mul, 3)
+                    avg_ver_time = round(avg_ver_time * unit_mul, 3)
+                    signature_times[scheme] = avg_sig_time
+                    verification_times[scheme] = avg_ver_time
+                signature_times = dict(sorted(signature_times.items(), key=lambda item: item[1]))
+                verification_times = dict(sorted(verification_times.items(), key=lambda item: item[1]))
+            case _:
+                print(f'{signature} is not a supported signature scheme')
+                exit()
+
+        # Print results
+        if (signature == 'SIGN-ALL'):
+            print('Signature speed ranking:')
+            best_time = list(signature_times.items())[0][1]
+            n = 1
+            for mode, time in signature_times.items():
+                print(f'{n} - {mode} - {time}{unit} (+{round(time - best_time, 3)}{unit})')
+                n += 1
+            print('Verification speed ranking:')
+            best_time = list(verification_times.items())[0][1]
+            n = 1
+            for mode, time in verification_times.items():
+                print(f'{n} - {mode} - {time}{unit} (+{round(time - best_time, 3)}{unit})')
+                n += 1
+        else:
+            if False in (avg_sig_time, avg_ver_time):
+                exit()
+            else:
+                avg_sig_time = round(avg_sig_time * unit_mul, 3)
+                avg_ver_time = round(avg_ver_time * unit_mul, 3)
+                print(f'Signature time: {avg_sig_time}{unit}')
+                print(f'Verification time: {avg_ver_time}{unit}')
