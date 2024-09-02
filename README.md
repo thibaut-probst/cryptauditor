@@ -1,5 +1,5 @@
 # cryptauditor
-![Python3.10](https://camo.githubusercontent.com/2eeb8947056ba0c1c3b1f9015ce807d0f0f462f99dce4c6acdcc7874f27b1820/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f707974686f6e2d332e31302d626c75652e737667)  
+![Python](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12-blue) 
 ---  
 A cryptography audit tool to measure algorithms speed.   
 ***cryptauditor*** uses Python and the [PyCryptodome](https://pycryptodome.readthedocs.io) library.  
